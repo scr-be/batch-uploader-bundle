@@ -1,18 +1,18 @@
 <?php
-
-namespace PunkAve\FileUploaderBundle\BlueImp;
-
 /*
- * jQuery File Upload Plugin PHP Class 5.11
- * https://github.com/blueimp/jQuery-File-Upload
+ * This file is part of the Scribe World Application.
  *
- * Copyright 2010, Sebastian Tschan
- * https://blueimp.net
+ * (c) Scribe Inc. <scribe@scribenet.com>
  *
- * Licensed under the MIT license:
- * http://www.opensource.org/licenses/MIT
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
+namespace Scribe\FileUploaderBundle\Component;
+
+/**
+ * Class UploadHandler
+ */
 class UploadHandler
 {
     protected $options;

@@ -1,7 +1,20 @@
 <?php
+/*
+ * This file is part of the Scribe World Application.
+ *
+ * (c) Scribe Inc. <scribe@scribenet.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
-namespace PunkAve\FileUploaderBundle\Services;
+namespace Scribe\FileUploaderBundle\Services;
 
+use Scribe\FileUploaderBundle\Compnent\UploadHandler;
+
+/**
+ * FileUploader class
+ */
 class FileUploader
 {
     protected $options;
@@ -103,7 +116,7 @@ class FileUploader
         }
 
         @mkdir($uploadDir, 0777, true);
-        $upload_handler = new \PunkAve\FileUploaderBundle\BlueImp\UploadHandler(
+        $upload_handler = new UploadHandler(
             array(
                 'upload_dir' => $uploadDir, 
                 'upload_url' => $webPath . '/' . $originals['folder'] . '/', 
