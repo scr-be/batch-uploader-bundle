@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Scribe\FileUploaderBundle\Twig;
+namespace Scribe\FileUploaderBundle\Templating\Extension;
 
 use Symfony\Component\DependencyInjection\ContainerInterface,
     Symfony\Component\DependencyInjection\ContainerAwareInterface;
