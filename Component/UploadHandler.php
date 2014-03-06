@@ -17,7 +17,7 @@ class UploadHandler
 {
     protected $options;
 
-    function __construct($options=null) {
+    function __construct($options = null) {
         $this->options = array(
             'script_url' => $this->getFullUrl().'/',
             'upload_dir' => dirname($_SERVER['SCRIPT_FILENAME']).'/files/',
@@ -183,46 +183,7 @@ class UploadHandler
             $file->error = 'missingFileName';
             return false;
         }
-        if (!preg_match($this->options['accept_file_types'], $file->name)) {
-            $file->error = 'acceptFileTypes';
-            return false;
-        }
-        if ($uploaded_file && is_uploaded_file($uploaded_file)) {
-            $file_size = filesize($uploaded_file);
-        } else {
-            $file_size = $_SERVER['CONTENT_LENGTH'];
-        }
-        if ($this->options['max_file_size'] && (
-                $file_size > $this->options['max_file_size'] ||
-                $file->size > $this->options['max_file_size'])
-            ) {
-            $file->error = 'maxFileSize';
-            return false;
-        }
-        if ($this->options['min_file_size'] &&
-            $file_size < $this->options['min_file_size']) {
-            $file->error = 'minFileSize';
-            return false;
-        }
-        if (is_int($this->options['max_number_of_files']) && (
-                count($this->get_file_objects()) >= $this->options['max_number_of_files'])
-            ) {
-            $file->error = 'maxNumberOfFiles';
-            return false;
-        }
-        list($img_width, $img_height) = @getimagesize($uploaded_file);
-        if (is_int($img_width)) {
-            if ($this->options['max_width'] && $img_width > $this->options['max_width'] ||
-                    $this->options['max_height'] && $img_height > $this->options['max_height']) {
-                $file->error = 'maxResolution';
-                return false;
-            }
-            if ($this->options['min_width'] && $img_width < $this->options['min_width'] ||
-                    $this->options['min_height'] && $img_height < $this->options['min_height']) {
-                $file->error = 'minResolution';
-                return false;
-            }
-        }
+
         return true;
     }
 

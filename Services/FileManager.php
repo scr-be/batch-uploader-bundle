@@ -10,18 +10,13 @@
 
 namespace Scribe\FileUploaderBundle\Services;
 
+use Scribe\FileUploaderBundle\Component\UploaderConfig;
+
 /**
  * FileManager class
  */
-class FileManager
+class FileManager extends UploaderConfig
 {
-    protected $options;
-
-    public function __construct($options)
-    {
-        $this->options = $options;
-    }
-
     /**
      * Get a list of files already present. The 'folder' option is required. 
      * If you pass consistent options to this method and handleFileUpload with

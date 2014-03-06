@@ -10,18 +10,19 @@
 
 namespace Scribe\FileUploaderBundle\Services;
 
-use Scribe\FileUploaderBundle\Compnent\UploadHandler;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Scribe\FileUploaderBundle\Component\UploadHandler,
+    Scribe\FileUploaderBundle\Component\UploaderConfig;
 
 /**
  * FileUploader class
  */
-class FileUploader
+class FileUploader extends UploaderConfig
 {
-    protected $options;
-
-    public function __construct($options)
+    public function construct(ContainerInterface $container = null)
     {
-        $this->options = $options;
+        parent::__construct($container);
+        $this->ScribeFileUploaderManager = $container->get('scribe.file_uploader_manager');
     }
 
     /**
@@ -31,7 +32,7 @@ class FileUploader
      */
     public function getFiles($options = array())
     {
-        return $this->options['file_manager']->getFiles($options);
+        return $this->ScribeFileUploaderManager->getFiles($options);
     }
 
     /**
@@ -41,7 +42,7 @@ class FileUploader
      */
     public function removeFiles($options = array())
     {
-        return $this->options['file_manager']->removeFiles($options);
+        return $this->ScribeFileUploaderManager->removeFiles($options);
     }
 
     /**
@@ -57,7 +58,7 @@ class FileUploader
      */
     public function syncFiles($options = array())
     {
-        return $this->options['file_manager']->syncFiles($options);
+        return $this->ScribeFileUploaderManager->syncFiles($options);
     }
 
     /**
@@ -89,41 +90,25 @@ class FileUploader
         }
 
         $options = array_merge($this->options, $options);
-
         $allowedExtensions = $options['allowed_extensions'];
 
         // Build a regular expression like /(\.gif|\.jpg|\.jpeg|\.png)$/i
         $allowedExtensionsRegex = '/(' . implode('|', array_map(function($extension) { return '\.' . $extension; }, $allowedExtensions)) . ')$/i';
 
-        $sizes = (isset($options['sizes']) && is_array($options['sizes'])) ? $options['sizes'] : array();
-
         $filePath = $options['file_base_path'] . '/' . $options['folder'];
         $webPath = $options['web_base_path'] . '/' . $options['folder'];
 
-        foreach ($sizes as &$size)
-        {
-            $size['upload_dir'] = $filePath . '/' . $size['folder'] . '/';
-            $size['upload_url'] = $webPath . '/' . $size['folder'] . '/';
-        }
-
-        $originals = $options['originals'];
-
-        $uploadDir = $filePath . '/' . $originals['folder'] . '/';
-
-        foreach ($sizes as &$size)
-        {
-            @mkdir($size['upload_dir'], 0777, true);
-        }
+        $uploadDir = $filePath;
 
         @mkdir($uploadDir, 0777, true);
         $upload_handler = new UploadHandler(
             array(
                 'upload_dir' => $uploadDir, 
-                'upload_url' => $webPath . '/' . $originals['folder'] . '/', 
-                'script_url' => $options['request']->getUri(),
-                'image_versions' => $sizes,
+                'upload_url' => $webPath, 
+                'script_url' => $this->container->get('request')->getUri(),
+                'image_versions' => [],
                 'accept_file_types' => $allowedExtensionsRegex,
-                'max_number_of_files' => $options['max_number_of_files'],
+                'max_number_of_files' => 100000,
             ));
 
         // From https://github.com/blueimp/jQuery-File-Upload/blob/master/server/php/index.php
