@@ -36,11 +36,6 @@ class FileUploaderReceiver extends FileUploaderConfig
 	private $utils;
 
 	/**
-	 * @var LoggerInterface
-	 */
-	private $logger;
-
-	/**
 	 * @var array
 	 */
 	private $defaultHeaders = [
@@ -67,11 +62,6 @@ class FileUploaderReceiver extends FileUploaderConfig
 			->container
 			->get('s.utils.controller')
 		;
-
-		$this->logger = $this
-			->container
-			->get('logger')
-		;
 	}
 
 	/**
@@ -84,7 +74,6 @@ class FileUploaderReceiver extends FileUploaderConfig
 		$this->editId = $editId;
 
 		$method = $this->request->server->get('REQUEST_METHOD');
-		$this->logger->error('request-method:'.$method);
 
 		switch ($method) {
 			case 'OPTIONS':
@@ -170,7 +159,6 @@ class FileUploaderReceiver extends FileUploaderConfig
 		$guessedExtension = $document->getExtension();
 
 		if (!in_array(strtolower($extension), $this->allowed_extensions) && !in_array(strtolower($guessedExtension), $this->allowed_extensions)) {
-			$this->logger->error('error');
 			$error = 'This filetype ('.$extension.'/'.$guessedExtension.') is not allowed';
 		} else {
 			$this->utils->entityPersist($document);
@@ -199,7 +187,6 @@ class FileUploaderReceiver extends FileUploaderConfig
 				$data[] = $this->getFileObjectFromEntity($file);
 			}
 		}
-		$this->logger->error('get-file:'.print_r($data, true));
 
 		return [$data, 200, []];
 	}

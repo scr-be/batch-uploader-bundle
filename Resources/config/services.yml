@@ -1,8 +1,4 @@
 parameters:
-    scribe.file_uploader.class:          Scribe\FileUploaderBundle\Services\FileUploader
-    scribe.file_uploader_manager.class:  Scribe\FileUploaderBundle\Services\FileManager
-    scribe.file_uploader.twig.class:     Scribe\FileUploaderBundle\Templating\Extension\UploaderFileExtension
-
     scribe.file_uploader_helper.class:   Scribe\FileUploaderBundle\Component\FileUploaderHelper
     scribe.file_uploader_receiver.class: Scribe\FileUploaderBundle\Component\FileUploaderReceiver
 
@@ -10,21 +6,6 @@ parameters:
     scribe.file_uploader.fileuploaderdocument.repo.class: Scribe\FileUploaderBundle\Entity\FileUploaderDocumentRepository
 
 services:
-    scribe.file_uploader:
-        class: %scribe.file_uploader.class%
-        arguments: ["@service_container"]
-        scope: request
-
-    scribe.file_uploader_manager:
-        class: %scribe.file_uploader_manager.class%
-        arguments: ["@service_container"]
-
-    scribe.file_uploader.twig:
-        class: %scribe.file_uploader.twig.class%
-        arguments: ["@service_container"]
-        tags:
-            - { name: twig.extension }
-
     scribe.file_uploader_helper:
         class: %scribe.file_uploader_helper.class%
         arguments: ["@service_container"]
