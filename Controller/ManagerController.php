@@ -39,7 +39,7 @@ class ManagerController
         $this->fileUploaderDocumentRepo = $fileUploaderDocumentRepo;
     }
 
-    public function getFileAction($fileId, $fileName)
+    public function getFileAction($fileId)
     {
         try {
             $document = $this

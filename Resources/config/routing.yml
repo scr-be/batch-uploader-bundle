@@ -1,5 +1,5 @@
 scribe_file_uploader_file_url:
-    pattern:  /file/get/{fileId}/{fileName}
+    pattern:  /file/get/{fileId}
     defaults: { _controller: scribe.file_uploader.manager.controller:getFileAction }
 
 scribe_file_uploader_file_delete:

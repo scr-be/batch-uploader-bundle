@@ -207,7 +207,7 @@ class FileUploaderReceiver extends FileUploaderConfig
 		$fileObject->type 		= $document->getMimeType();
 		$fileObject->extension  = $document->getExtension();
 		if ($error === null) {
-			$fileObject->url  		= $router->generate('scribe_file_uploader_file_url', ['fileName' => urlencode($document->getName()), 'fileId' => $document->getId()]);
+			$fileObject->url  		= $router->generate('scribe_file_uploader_file_url', ['fileId' => $document->getId()]);
 			$fileObject->deleteUrl = $router->generate('scribe_file_uploader_file_delete', ['fileName' => urlencode($document->getName()), 'fileId' => $document->getId()]);
 		}
 		$fileObject->error      = $error;
