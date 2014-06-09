@@ -36,6 +36,16 @@ class FileUploaderReceiver extends FileUploaderConfig
 	private $utils;
 
 	/**
+	 * @var bool
+	 */
+	private $useEntity;
+
+	/**
+	 * @var string|null
+	 */
+	private $filesystemPath;
+
+	/**
 	 * @var array
 	 */
 	private $defaultHeaders = [
@@ -62,6 +72,23 @@ class FileUploaderReceiver extends FileUploaderConfig
 			->container
 			->get('s.utils.controller')
 		;
+
+		$this->useEntity 	  = true;
+		$this->filesystemPath = null;
+	}
+
+	public function setUseEntity($bool)
+	{
+		$this->useEntity = $bool;
+
+		return $this;
+	}
+
+	public function setFilesystemPath($path)
+	{
+		$this->filesystemPath = $path;
+
+		return $this;
 	}
 
 	/**
@@ -69,7 +96,7 @@ class FileUploaderReceiver extends FileUploaderConfig
 	 * @param  string $projectId
 	 * @return array
 	 */
-	public function handle($editId)
+	public function handle($editId = null)
 	{
 		$this->editId = $editId;
 
@@ -143,6 +170,15 @@ class FileUploaderReceiver extends FileUploaderConfig
 
 	private function handlePostFile(UploadedFile $file)
 	{
+		if ($this->useEntity === true) {
+			return $this->handlePostFileToEntity($file);
+		} else {
+			return $this->handlePostFileToFilesystem($file);
+		}
+	}
+
+	private function handlePostFileToEntity(UploadedFile $file)
+	{
 		$error = null;
 
 		$document = new FileUploaderDocument();
@@ -167,10 +203,33 @@ class FileUploaderReceiver extends FileUploaderConfig
 		return $this->getFileObjectFromEntity($document, $error);
 	}
 
+	private function handlePostFileToFilesystem(UploadedFile $file)
+	{
+		$error = null;
+
+		$clientOrigName = $file->getClientOriginalName();
+
+		$extension        = pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION);
+		$guessedExtension = $file->guessExtension();
+
+		$file->move($this->filesystemPath, $file->getClientOriginalName());
+
+		return $this->getFileObjectFromFilesystem($this->filesystemPath . DIRECTORY_SEPARATOR . $clientOrigName, $error);
+	}
+
 	private function handleGet()
 	{
 		$data = [];
 
+		if ($this->useEntity === true) {
+			return $this->handleGetForEntity();
+		} else {
+			return $this->handleGetForFilesystem();
+		}
+	}
+
+	private function handleGetForEntity()
+	{
 		$filesRepo = $this
 			->container
 			->get('doctrine.orm.default_entity_manager')
@@ -189,6 +248,47 @@ class FileUploaderReceiver extends FileUploaderConfig
 		}
 
 		return [$data, 200, []];
+	}
+
+	private function handleGetForFilesystem()
+	{
+		if ($this->request->request->has('file')) {
+			$fileName = basename($this->request->request->has('get'));
+			$file = $this->filesystemPath . DIRECTORY_SEPARATOR . $fileName;
+			$data[] = $this->getFileObjectFromEntity($file);
+		} else {
+			$files = $filesRepo->findByEditId($this->editId);
+			foreach ($files as $file) {
+				$data[] = $this->getFileObjectFromEntity($file);
+			}
+		}
+
+		return [$data, 200, []];
+	}
+
+	private function getFileObjectFromFilesystem($path, $error = null)
+	{
+		$router = $this
+			->utils
+			->getService('router')
+		;
+
+		$fileObject = new \stdClass();
+		if ($error === null) {
+			$fileObject->id = md5($path);
+		}
+		$fileObject->name 	   = basename($path);
+		$fileObject->size 	   = filesize($path);
+		$finfo = finfo_open(FILEINFO_MIME_TYPE);
+		$fileObject->type 	   = finfo_file($finfo, $path);
+		$fileObject->extension = pathinfo($path, PATHINFO_EXTENSION);
+		if ($error === null) {
+			$fileObject->url  	   = $router->generate('scribe_file_uploader_filesystem_url',    ['fileId'   => $fileObject->id]);
+			$fileObject->deleteUrl = $router->generate('scribe_file_uploader_filesystem_delete', ['fileName' => urlencode($path)]);
+		}
+		$fileObject->error      = $error;
+
+		return $fileObject;
 	}
 
 	private function getFileObjectFromEntity(FileUploaderDocument $document, $error = null)

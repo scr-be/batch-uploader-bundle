@@ -5,3 +5,13 @@ scribe_file_uploader_file_url:
 scribe_file_uploader_file_delete:
     pattern:  /file/delete/{fileId}/{fileName}
     defaults: { _controller: scribe.file_uploader.manager.controller:deleteFileAction }
+
+scribe_file_uploader_filesystem_url:
+    pattern:  /file/get/{fileId}
+    defaults: { _controller: scribe.file_uploader.manager.controller:getFilesyetemFileAction }
+
+scribe_file_uploader_filesystem_delete:
+    pattern:  /file/delete/{fileName}
+    defaults: { _controller: scribe.file_uploader.manager.controller:deleteFilesystemFileAction }
+    requirements:
+        relative_path: .+
