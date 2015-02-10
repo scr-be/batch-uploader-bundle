@@ -12,7 +12,7 @@ namespace Scribe\FileUploaderBundle\Controller;
 
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException,
     Symfony\Component\HttpFoundation\Response;
-use Scribe\SharedBundle\Utility\Controller\ControllerUtils,
+use Scribe\Component\Controller\ControllerUtils,
     Scribe\FileUploaderBundle\Entity\FileUploaderDocumentRepository;
 
 /**
