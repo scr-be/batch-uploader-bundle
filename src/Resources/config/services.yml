@@ -16,6 +16,7 @@ services:
 
     scribe.file_uploader.manager.controller: 
         class:      %scribe.file_uploader.manager.controller.class%
+        parent:     s.mantle.abstract.controller
         arguments:  [ "@s.utils.controller", "@scribe.file_uploader.fileuploaderdocument.repo" ]
 
     scribe.file_uploader.fileuploaderdocument.repo:

@@ -20,11 +20,6 @@ use Scribe\Component\Controller\ControllerUtils,
  */
 class ManagerController
 {
-	/**
-     * @var ControllerUtils
-     */
-    private $utils;
-
     /**
      * @var FileUploaderDocumentRepository
      */
@@ -35,7 +30,6 @@ class ManagerController
      */
     public function __construct(ControllerUtils $utils, FileUploaderDocumentRepository $fileUploaderDocumentRepo)
     {
-        $this->utils                    = $utils;
         $this->fileUploaderDocumentRepo = $fileUploaderDocumentRepo;
     }
 
