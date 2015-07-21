@@ -1,31 +1,26 @@
 parameters:
-    scribe.file_uploader_helper.class:                      Scribe\FileUploaderBundle\Component\FileUploaderHelper
-    scribe.file_uploader_receiver.class:                    Scribe\FileUploaderBundle\Component\FileUploaderReceiver
+    scribe.file_uploader_helper.class:   Scribe\FileUploaderBundle\Component\FileUploaderHelper
+    scribe.file_uploader_receiver.class: Scribe\FileUploaderBundle\Component\FileUploaderReceiver
 
-    scribe.file_uploader.manager.controller.class:          Scribe\FileUploaderBundle\Controller\ManagerController
-    scribe.file_uploader.fileuploaderdocument.repo.class:   Scribe\FileUploaderBundle\Entity\FileUploaderDocumentRepository
+    scribe.file_uploader.manager.controller.class:        Scribe\FileUploaderBundle\Controller\ManagerController
+    scribe.file_uploader.fileuploaderdocument.repo.class: Scribe\FileUploaderBundle\Entity\FileUploaderDocumentRepository
 
 services:
     scribe.file_uploader_helper:
         class: %scribe.file_uploader_helper.class%
-        arguments:
-            - @service_container
+        arguments: ["@service_container"]
 
     scribe.file_uploader_receiver:
         class: %scribe.file_uploader_receiver.class%
-        arguments:
-            - @service_container
+        arguments: ["@service_container"]
 
     scribe.file_uploader.manager.controller: 
-        class:  %scribe.file_uploader.manager.controller.class%
-        parent: s.mantle.abstract.controller
-        arguments:
-            - @scribe.file_uploader.fileuploaderdocument.repo
+        class:      %scribe.file_uploader.manager.controller.class%
+        arguments:  [ "@s.utils.controller", "@scribe.file_uploader.fileuploaderdocument.repo" ]
 
     scribe.file_uploader.fileuploaderdocument.repo:
-        class: %scribe.file_uploader.fileuploaderdocument.repo.class%
-        factory:
-            - @doctrine
-            - getRepository
+        class:           %scribe.file_uploader.fileuploaderdocument.repo.class%
+        factory_service: doctrine
+        factory_method:  getRepository
         arguments:
             - Scribe\FileUploaderBundle\Entity\FileUploaderDocument

@@ -10,33 +10,35 @@
 
 namespace Scribe\FileUploaderBundle\Controller;
 
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Scribe\MantleBundle\Component\Controller\Behaviors\ControllerBehaviors;
-use Scribe\FileUploaderBundle\Entity\FileUploaderDocumentRepository;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException,
+    Symfony\Component\HttpFoundation\Response;
+use Scribe\SharedBundle\Utility\Controller\ControllerUtils,
+    Scribe\FileUploaderBundle\Entity\FileUploaderDocumentRepository;
 
 /**
- * Class ManagerController.
+ * Class ManagerController
  */
-class ManagerController extends ControllerBehaviors
+class ManagerController
 {
+	/**
+     * @var ControllerUtils
+     */
+    private $utils;
+
     /**
      * @var FileUploaderDocumentRepository
      */
     private $fileUploaderDocumentRepo;
 
     /**
-     * @param FileUploaderDocumentRepository $fileUploaderDocumentRepo
+     * @param  ControllerUtils $utils
      */
-    public function __construct(FileUploaderDocumentRepository $fileUploaderDocumentRepo)
+    public function __construct(ControllerUtils $utils, FileUploaderDocumentRepository $fileUploaderDocumentRepo)
     {
+        $this->utils                    = $utils;
         $this->fileUploaderDocumentRepo = $fileUploaderDocumentRepo;
     }
 
-    /**
-     * @param string $fileId
-     *
-     * @return mixed
-     */
     public function getFileAction($fileId)
     {
         try {
@@ -48,17 +50,14 @@ class ManagerController extends ControllerBehaviors
             throw new NotFoundHttpException('The requested file could not be found');
         }
 
-        return $this->getResponse(
-            stream_get_contents($document->getFile()),
-            [
-                'Content-Type'              => 'application/octet-stream',
-                'Content-Disposition'       => 'attachment; filename="' . $document->getName() . '"',
-                'Content-Length'            => $document->getSize(),
-                'Content-Transfer-Encoding' => 'binary',
-                'Expires'                   => 0,
-                'Cache-Control'             => 'must-revalidate',
-                'Pragma'                    => 'public',
-            ],
-            200);
+        return $this->utils->returnResponse(stream_get_contents($document->getFile()), 200, [
+            'Content-Type'              => 'application/octet-stream',
+            'Content-Disposition'       => 'attachment; filename="' . $document->getName() . '"',
+            'Content-Length'            => $document->getSize(),
+            'Content-Transfer-Encoding' => 'binary',
+            'Expires'                   => 0,
+            'Cache-Control'             => 'must-revalidate',
+            'Pragma'                    => 'public',
+        ]);
     }
 }

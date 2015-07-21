@@ -236,6 +236,7 @@ class FileUploaderReceiver extends FileUploaderConfig
 			->getRepository('ScribeFileUploaderBundle:FileUploaderDocument')
 		;
 
+		$data = [];
 		if ($this->request->request->has('file')) {
 			$fileName = basename($this->request->request->has('get'));
 			$file = $filesRepo->findOneByName($fileName);
