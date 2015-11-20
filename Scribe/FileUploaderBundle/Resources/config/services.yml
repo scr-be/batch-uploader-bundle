@@ -8,15 +8,15 @@ parameters:
 services:
     scribe.file_uploader_helper:
         class: %scribe.file_uploader_helper.class%
-        arguments: ['@service_container']
+        arguments: ["@service_container"]
 
     scribe.file_uploader_receiver:
         class: %scribe.file_uploader_receiver.class%
-        arguments: ['@service_container']
+        arguments: ["@service_container"]
 
     scribe.file_uploader.manager.controller: 
         class:      %scribe.file_uploader.manager.controller.class%
-        arguments:  [ '@s.utils.controller', '@scribe.file_uploader.fileuploaderdocument.repo' ]
+        arguments:  [ "@s.utils.controller", "@scribe.file_uploader.fileuploaderdocument.repo" ]
 
     scribe.file_uploader.fileuploaderdocument.repo:
         class:           %scribe.file_uploader.fileuploaderdocument.repo.class%
