@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "ed9d3050d4ca59b97d007fd0af0300f6",
-    "content-hash": "822a42d52610450e209cf52dbe7c37e7",
+    "hash": "aebf9e98377cde02a8f1ffe1ddda187e",
+    "content-hash": "3b4fa3170a1fe6257360c2adc9e118ce",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -4243,16 +4243,16 @@
         },
         {
             "name": "satooshi/php-coveralls",
-            "version": "v0.7.1",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/satooshi/php-coveralls.git",
-                "reference": "01793ce60f1e259592ac3cb7c3fc183209800127"
+                "reference": "3edbdbdb4f4cfab5cb9ce83655ff81432f2221a6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/satooshi/php-coveralls/zipball/01793ce60f1e259592ac3cb7c3fc183209800127",
-                "reference": "01793ce60f1e259592ac3cb7c3fc183209800127",
+                "url": "https://api.github.com/repos/satooshi/php-coveralls/zipball/3edbdbdb4f4cfab5cb9ce83655ff81432f2221a6",
+                "reference": "3edbdbdb4f4cfab5cb9ce83655ff81432f2221a6",
                 "shasum": ""
             },
             "require": {
@@ -4302,7 +4302,7 @@
                 "github",
                 "test"
             ],
-            "time": "2015-12-17 18:04:18"
+            "time": "2015-12-28 09:07:32"
         },
         {
             "name": "sebastian/comparator",
