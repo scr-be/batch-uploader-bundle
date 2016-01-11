@@ -31,7 +31,8 @@ services:
 
     s.file_uploader.document.repo:
         class           : %s.file_uploader.document.repo.class%
-        factory_service : doctrine
-        factory_method  : getRepository
+        factory :
+            - doctrine
+            - getRepository
         arguments:
             - %s.file_uploader.document.entity.class%

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Scribe Batch Uploader Bundle.
  *
@@ -13,6 +14,8 @@ namespace Scribe\FileUploaderBundle;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
- * ScribeFileUploaderBundle class
+ * Class ScribeFileUploaderBundle.
  */
 class ScribeFileUploaderBundle extends Bundle {}
+
+/* EOF */

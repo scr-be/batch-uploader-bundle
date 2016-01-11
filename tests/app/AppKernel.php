@@ -18,8 +18,6 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 class AppKernel extends Kernel
 {
     /**
-     * registerBundles.
-     *
      * @return array
      */
     public function registerBundles()
@@ -32,8 +30,9 @@ class AppKernel extends Kernel
             new \Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle(),
             new \Scribe\WonkaBundle\ScribeWonkaBundle(),
             new \Scribe\MantleBundle\ScribeMantleBundle(),
-            new \Scribe\CacheBundle\ScribeCacheBundle(),
+            new \Scribe\Teavee\ObjectCacheBundle\ScribeTeaveeObjectCacheBundle(),
             new \Symfony\Bundle\MonologBundle\MonologBundle(),
+            new \Scribe\FileUploaderBundle\ScribeFileUploaderBundle(),
         ];
 
         if (in_array($this->getEnvironment(), ['dev', 'test'])) {
@@ -44,8 +43,6 @@ class AppKernel extends Kernel
     }
 
     /**
-     * registerContainerConfiguration.
-     *
      * @param LoaderInterface $loader
      */
     public function registerContainerConfiguration(LoaderInterface $loader)
