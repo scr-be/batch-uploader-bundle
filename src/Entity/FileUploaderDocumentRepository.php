@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Scribe Batch Uploader Bundle.
+ *
+ * (c) Scribe Inc. <scribe@scribenet.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Scribe\FileUploaderBundle\Entity;
 
 use Doctrine\ORM\EntityRepository;
@@ -10,7 +19,31 @@ use Doctrine\ORM\EntityRepository;
 class FileUploaderDocumentRepository extends EntityRepository
 {
 	/**
-	 * @return integer
+	 * @param int $id
+	 *
+	 * @return mixed|null
+	 */
+	public function findOneById($id)
+	{
+		$q = $this
+			->createQueryBuilder('d')
+			->where('d.id = :id')
+			->setParameter('id', $id)
+			->getQuery();
+
+		try {
+			$r = $q->getSingleResult();
+		} catch (\Exception $e) {
+			return null;
+		}
+
+		return $r;
+	}
+
+	/**
+	 * @param int $editId
+	 *
+	 * @return mixed
 	 */
 	public function findCountByEditId($editId)
 	{
@@ -26,7 +59,10 @@ class FileUploaderDocumentRepository extends EntityRepository
 	}
 
 	/**
-	 * @return integer
+	 * @param int $editId
+	 * @param array $exts
+	 *
+	 * @return array
 	 */
 	public function findImagesByEditId($editId, $exts = ['jpeg', 'jpg', 'png', 'bmp', 'tiff', 'tif'])
 	{
@@ -58,3 +94,5 @@ class FileUploaderDocumentRepository extends EntityRepository
     	return $q->getResult();
 	}
 }
+
+/* EOF */

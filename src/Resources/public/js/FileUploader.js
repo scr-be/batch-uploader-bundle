@@ -1,5 +1,5 @@
 /*
- * This file is part of the Scribe World Application.
+ * This file is part of the Scribe Batch Uploader Bundle.
  *
  * (c) Scribe Inc. <scribe@scribenet.com>
  *

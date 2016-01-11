@@ -1,6 +1,7 @@
 <?php
+
 /*
- * This file is part of the Scribe World Application.
+ * This file is part of the Scribe Batch Uploader Bundle.
  *
  * (c) Scribe Inc. <scribe@scribenet.com>
  *
@@ -10,45 +11,45 @@
 
 namespace Scribe\FileUploaderBundle\Component;
 
-use Symfony\Component\DependencyInjection\ContainerInterface,
-	Symfony\Component\HttpFoundation\File\File,
-	Symfony\Component\HttpFoundation\File\UploadedFile;
+use Scribe\MantleBundle\Component\DependencyInjection\Aware\RequestStackAwareTrait;
+use Scribe\Wonka\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Scribe\FileUploaderBundle\Entity\FileUploaderDocument;
+use Doctrine\ORM\EntityManager;
 
 /**
- * FileUploaderReceiver class
+ * Class FileUploaderReceiver
  */
 class FileUploaderReceiver extends FileUploaderConfig
 {
+	use RequestStackAwareTrait;
+
 	/**
 	 * @var string
 	 */
-	private $editId;
-
-	/**
-	 * @var Request
-	 */
-	private $request;
-
-	/**
-	 * @var ControllerUtils
-	 */
-	private $utils;
+	protected $editId;
 
 	/**
 	 * @var bool
 	 */
-	private $useEntity;
+	protected $useEntity;
 
 	/**
 	 * @var string|null
 	 */
-	private $filesystemPath;
+	protected $filesystemPath;
+
+	/**
+	 * @var EntityManager
+	 */
+	protected $em;
 
 	/**
 	 * @var array
 	 */
-	private $defaultHeaders = [
+	protected $defaultHeaders = [
 		'Pragma'                       => 'no-cache',
 		'Cache-Control'                => 'no-store, no-cache, must-revalidate',
 		'Content-Disposition'          => 'inline; filename="files.json"',
@@ -58,25 +59,24 @@ class FileUploaderReceiver extends FileUploaderConfig
 		'Access-Control-Allow-Headers' => 'X-File-Name, X-File-Type, X-File-Size',
 	];
 
+	/**
+	 * @param ContainerInterface|null $container
+	 */
 	public function __construct(ContainerInterface $container = null)
 	{
 		parent::__construct($container);
 
-		$this->request = $this
-			->container
-			->get('request_stack')
-			->getMasterRequest()
-		;
-
-		$this->utils = $this
-			->container
-			->get('s.utils.controller')
-		;
-
+		$this->requestStack = $this->getContainerService('request_stack');
+		$this->em = $this->getContainerService('doctrine.orm.entity_manager');
 		$this->useEntity 	  = true;
 		$this->filesystemPath = null;
 	}
 
+	/**
+	 * @param $bool
+	 *
+	 * @return $this
+	 */
 	public function setUseEntity($bool)
 	{
 		$this->useEntity = $bool;
@@ -84,6 +84,11 @@ class FileUploaderReceiver extends FileUploaderConfig
 		return $this;
 	}
 
+	/**
+	 * @param $path
+	 *
+	 * @return $this
+	 */
 	public function setFilesystemPath($path)
 	{
 		$this->filesystemPath = $path;
@@ -93,18 +98,19 @@ class FileUploaderReceiver extends FileUploaderConfig
 
 	/**
 	 * @param  string $editId
-	 * @param  string $projectId
+	 *
 	 * @return array
 	 */
 	public function handle($editId = null)
 	{
 		$this->editId = $editId;
 
-		$method = $this->request->server->get('REQUEST_METHOD');
+		$method = $this->getMasterRequest()->server->get('REQUEST_METHOD');
 
 		switch ($method) {
 			case 'OPTIONS':
-				list($data, $status, $headers) = $this->handleOptions();
+				throw new RuntimeException('handleOptions not implemented');
+				// @toto: implement list($data, $status, $headers) = $this->handleOptions();
 				break;
 
 			case 'HEAD':
@@ -113,21 +119,25 @@ class FileUploaderReceiver extends FileUploaderConfig
 				break;
 
 			case 'POST':
-				if ($this->request->request->has('_method') && $this->request->request->get('_method') === 'DELETE') {
-					list($data, $status, $headers) = $this->handleDelete();
+				if ($this->getMasterRequest()->request->has('_method') &&
+					$this->getMasterRequest()->request->get('_method') === 'DELETE')
+				{
+					throw new RuntimeException('handleDelete not implemented');
+					// @toto: implement list($data, $status, $headers) = $this->handleDelete();
 				} else {
 					list($data, $status, $headers) = $this->handlePost();
 				}
 				break;
 
 			case 'DELETE':
-				list($data, $status, $headers) = $this->handleDelete();
+				throw new RuntimeException('handleDelete not implemented');
+				// @toto: implement list($data, $status, $headers) = $this->handleDelete();
 				break;
 
 			default:
 				$data    = [];
-				$status  = ['405' => 'Method Not Allowed'];
 				$headers = [];
+				$status  = [ '405' => 'Method Not Allowed' ];
 		}
 
 		$finalHeaders = array_merge($this->defaultHeaders, $headers);
@@ -139,24 +149,25 @@ class FileUploaderReceiver extends FileUploaderConfig
 		];
 	}
 
-	private function handlePost()
+	/**
+	 * @return array
+	 */
+	protected function handlePost()
 	{
 		$files = [];
-		$headers = [
-			'Vary' => 'Accept'
-		];
+		$headers = [ 'Vary' => 'Accept' ];
 		$status = 200;
 
-		foreach ($this->request->files as $file) {
-
-			if (is_array($file)) {
-				for ($i = 0; $i < count($file); $i++) {
-					$files[] = $this->handlePostFile($file[$i]);
-				}
-			} else {
+		foreach ($this->getMasterRequest()->files as $file) {
+			if (!is_array($file)) {
 				$files[] = $this->handlePostFile($file);
+
+				continue;
 			}
-			
+
+			for ($i = 0; $i < count($file); $i++) {
+				$files[] = $this->handlePostFile($file[$i]);
+			}
 		}
 
 		foreach ($files as $file) {
@@ -165,19 +176,29 @@ class FileUploaderReceiver extends FileUploaderConfig
 			}
 		}
 
-		return [['files' => $files], $status, $headers];
+		return [
+			['files' => $files],
+			$status,
+			$headers
+		];
 	}
 
-	private function handlePostFile(UploadedFile $file)
+	/**
+	 * @param UploadedFile $file
+	 *
+	 * @return \stdClass
+	 */
+	protected function handlePostFile(UploadedFile $file)
 	{
-		if ($this->useEntity === true) {
-			return $this->handlePostFileToEntity($file);
-		} else {
-			return $this->handlePostFileToFilesystem($file);
-		}
+		return $this->useEntity ? $this->handlePostFileToEntity($file) : $this->handlePostFileToFilesystem($file);
 	}
 
-	private function handlePostFileToEntity(UploadedFile $file)
+	/**
+	 * @param UploadedFile $file
+	 *
+	 * @return \stdClass
+	 */
+	protected function handlePostFileToEntity(UploadedFile $file)
 	{
 		$error = null;
 
@@ -188,57 +209,55 @@ class FileUploaderReceiver extends FileUploaderConfig
 			->setSize($file->getSize())
 			->setMimeType($file->getMimeType())
 			->setExtension(pathinfo($document->getName(), PATHINFO_EXTENSION))
-			->setFile(file_get_contents($file->getPathname()))
-		;
+			->setFile(file_get_contents($file->getPathname()));
 
-		$extension        = pathinfo($document->getName(), PATHINFO_EXTENSION);
+		$extension = pathinfo($document->getName(), PATHINFO_EXTENSION);
 		$guessedExtension = $document->getExtension();
 
-		if (!in_array(strtolower($extension), $this->allowed_extensions) && !in_array(strtolower($guessedExtension), $this->allowed_extensions)) {
+		if (!in_array(strtolower($extension), $this->extensionWhitelist) &&
+			!in_array(strtolower($guessedExtension), $this->extensionWhitelist)) {
 			$error = 'This filetype ('.$extension.'/'.$guessedExtension.') is not allowed';
 		} else {
-			$this->utils->entityPersist($document);
+			$this->em->persist($document);
+			$this->em->flush($document);
 		}
 
 		return $this->getFileObjectFromEntity($document, $error);
 	}
 
-	private function handlePostFileToFilesystem(UploadedFile $file)
+	/**
+	 * @param UploadedFile $file
+	 *
+	 * @return \stdClass
+	 */
+	protected function handlePostFileToFilesystem(UploadedFile $file)
 	{
 		$error = null;
-
 		$clientOrigName = $file->getClientOriginalName();
-
-		$extension        = pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION);
-		$guessedExtension = $file->guessExtension();
 
 		$file->move($this->filesystemPath, $file->getClientOriginalName());
 
 		return $this->getFileObjectFromFilesystem($this->filesystemPath . DIRECTORY_SEPARATOR . $clientOrigName, $error);
 	}
 
-	private function handleGet()
+	/**
+	 * @return array
+	 */
+	protected function handleGet()
 	{
-		$data = [];
-
-		if ($this->useEntity === true) {
-			return $this->handleGetForEntity();
-		} else {
-			return $this->handleGetForFilesystem();
-		}
+		return $this->useEntity ? $this->handleGetForEntity() : $this->handleGetForFilesystem();
 	}
 
-	private function handleGetForEntity()
+	/**
+	 * @return array
+	 */
+	protected function handleGetForEntity()
 	{
-		$filesRepo = $this
-			->container
-			->get('doctrine.orm.default_entity_manager')
-			->getRepository('ScribeFileUploaderBundle:FileUploaderDocument')
-		;
-
+		$filesRepo = $this->em->getRepository('ScribeFileUploaderBundle:FileUploaderDocument');
 		$data = [];
-		if ($this->request->request->has('file')) {
-			$fileName = basename($this->request->request->has('get'));
+
+		if ($this->getMasterRequest()->request->has('file')) {
+			$fileName = basename($this->getMasterRequest()->request->has('get'));
 			$file = $filesRepo->findOneByName($fileName);
 			$data[] = $this->getFileObjectFromEntity($file);
 		} else {
@@ -251,68 +270,74 @@ class FileUploaderReceiver extends FileUploaderConfig
 		return [$data, 200, []];
 	}
 
-	private function handleGetForFilesystem()
+	/**
+	 * @return array
+	 */
+	protected function handleGetForFilesystem()
 	{
-		if ($this->request->request->has('file')) {
-			$fileName = basename($this->request->request->has('get'));
-			$file = $this->filesystemPath . DIRECTORY_SEPARATOR . $fileName;
-			$data[] = $this->getFileObjectFromEntity($file);
-		} else {
-			$files = $filesRepo->findByEditId($this->editId);
-			foreach ($files as $file) {
-				$data[] = $this->getFileObjectFromEntity($file);
-			}
-		}
-
-		return [$data, 200, []];
+		return [[], 200, []];
 	}
 
-	private function getFileObjectFromFilesystem($path, $error = null)
+	/**
+	 * @param $path
+	 * @param null $error
+	 *
+	 * @return \stdClass
+	 */
+	protected function getFileObjectFromFilesystem($path, $error = null)
 	{
-		$router = $this
-			->utils
-			->getService('router')
-		;
-
+		$router = $this->getContainerService('router');
 		$fileObject = new \stdClass();
+
 		if ($error === null) {
 			$fileObject->id = md5($path);
 		}
+
 		$fileObject->name 	   = basename($path);
 		$fileObject->size 	   = filesize($path);
 		$finfo = finfo_open(FILEINFO_MIME_TYPE);
 		$fileObject->type 	   = finfo_file($finfo, $path);
 		$fileObject->extension = pathinfo($path, PATHINFO_EXTENSION);
+
 		if ($error === null) {
 			$fileObject->url  	   = $router->generate('scribe_file_uploader_filesystem_url',    ['fileId'   => $fileObject->id]);
 			$fileObject->deleteUrl = $router->generate('scribe_file_uploader_filesystem_delete', ['fileName' => urlencode($path)]);
 		}
+
 		$fileObject->error      = $error;
 
 		return $fileObject;
 	}
 
-	private function getFileObjectFromEntity(FileUploaderDocument $document, $error = null)
+	/**
+	 * @param FileUploaderDocument $document
+	 * @param null $error
+	 *
+	 * @return \stdClass
+	 */
+	protected function getFileObjectFromEntity(FileUploaderDocument $document, $error = null)
 	{
-		$router = $this
-			->utils
-			->getService('router')
-		;
-
+		$router = $this->getContainerService('router');
 		$fileObject = new \stdClass();
+
 		if ($error === null) {
 			$fileObject->id = $document->getId();
 		}
+
 		$fileObject->name 		= $document->getName();
 		$fileObject->size 		= $document->getSize();
 		$fileObject->type 		= $document->getMimeType();
 		$fileObject->extension  = $document->getExtension();
+
 		if ($error === null) {
 			$fileObject->url  		= $router->generate('scribe_file_uploader_file_url', ['fileId' => $document->getId()]);
 			$fileObject->deleteUrl = $router->generate('scribe_file_uploader_file_delete', ['fileName' => urlencode($document->getName()), 'fileId' => $document->getId()]);
 		}
+
 		$fileObject->error      = $error;
 
 		return $fileObject;
 	}
 }
+
+/* EOF */

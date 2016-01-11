@@ -1,6 +1,7 @@
 <?php
+
 /*
- * This file is part of the Scribe World Application.
+ * This file is part of the Scribe Batch Uploader Bundle.
  *
  * (c) Scribe Inc. <scribe@scribenet.com>
  *
@@ -10,53 +11,117 @@
 
 namespace Scribe\FileUploaderBundle\Component;
 
-use Symfony\Component\DependencyInjection\ContainerInterface,
-    Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Scribe\WonkaBundle\Component\DependencyInjection\Container\ContainerAwareTrait;
+use Scribe\WonkaBundle\Component\DependencyInjection\Container\ContainerAwareInterface;
 
 /**
- * FileUploaderConfig class
+ * Class FileUploaderConfig
  */
 class FileUploaderConfig implements ContainerAwareInterface
 {
-	protected $container;
+	use ContainerAwareTrait;
+
+	/**
+	 * @var array
+	 */
 	protected $options = [];
 
+	/**
+	 * @var string
+	 */
+	protected $baseFilePath;
+
+	/**
+	 * @var string
+	 */
+	protected $baseWebPath;
+
+	/**
+	 * @var string[]
+	 */
+	protected $extensionWhitelist;
+
+	/**
+	 * @var bool
+	 */
+	protected $imageProcessEnableAll;
+
+	/**
+	 * @var bool
+	 */
+	protected $imageProcessThumbnails;
+	
+	/*
+	 * @var string
+	 */
+	protected $imageProcessThumbnailsPath;
+
+	/**
+	 * @var int
+	 */
+	protected $imageProcessThumbnailsWidth;
+
+	/**
+	 * @var int
+	 */
+	protected $imageProcessThumbnailsHeight;
+
+	/**
+	 * @var bool
+	 */
+	protected $imageProcessThumbnailsSquared;
+
+	/**
+	 * @param ContainerInterface|null $container
+	 */
 	public function __construct(ContainerInterface $container = null) 
 	{
 		$this->setContainer($container);
 		$this->options = $this->getConfigFromContainer();
 	}
 
-	public function setContainer(ContainerInterface $container = null) 
+	/**
+	 * @return array
+	 */
+	public function getConfigFromContainer()
 	{
-		$this->container = $container;
+		$this->baseFilePath = $this->getContainerParameter('s.file_uploader.base_filepath');
+		$this->baseWebPath = $this->getContainerParameter('s.file_uploader.base_webpath');
+		$this->extensionWhitelist = $this->getContainerParameter('s.file_uploader.allowed_extensions');
+		$this->imageProcessEnableAll = $this->getContainerParameter('s.file_uploader.image_processing.enable_all');
+		$this->imageProcessThumbnails = $this->getContainerParameter('s.file_uploader.image_processing.thumbnails.enabled');
+		$this->imageProcessThumbnailsPath = $this->getContainerParameter('s.file_uploader.image_processing.thumbnails.folder');
+		$this->imageProcessThumbnailsWidth = $this->getContainerParameter('s.file_uploader.image_processing.thumbnails.width');
+		$this->imageProcessThumbnailsHeight = $this->getContainerParameter('s.file_uploader.image_processing.thumbnails.height');
+		$this->imageProcessThumbnailsSquared = $this->getContainerParameter('s.file_uploader.image_processing.thumbnails.square');
+
+        $this->processConfig();
+
+		return [
+			'file_base_path' 	 => $this->baseFilePath,
+			'web_base_path'  	 => $this->baseWebPath,
+			'allowed_extensions' => $this->extensionWhitelist
+		];
+	}
+
+	/**
+	 * @return $this
+	 */
+	protected function processConfig()
+	{
+		$kernelRootPath = $this
+			->getContainerService('kernel')
+			->getRootDir();
+
+		$this->baseFilePath = str_replace('%kernel.root_dir%', $kernelRootPath, $this->baseFilePath);
+
+		array_walk($this->extensionWhitelist, function(&$e) {
+			$e = strtolower($e);
+		});
 
 		return $this;
 	}
-
-	public function getConfigFromContainer()
-	{
-		$this->base_filepath                       = $this->container->getParameter('scribe_file_uploader.base_filepath');
-		$this->base_webpath                        = $this->container->getParameter('scribe_file_uploader.base_webpath');
-		$this->allowed_extensions                  = $this->container->getParameter('scribe_file_uploader.allowed_extensions');
-		$this->image_processing_enable_all         = $this->container->getParameter('scribe_file_uploader.image_processing.enable_all');
-		$this->image_processing_thumbnails_enabled = $this->container->getParameter('scribe_file_uploader.image_processing.thumbnails.enabled');
-		$this->image_processing_thumbnails_folder  = $this->container->getParameter('scribe_file_uploader.image_processing.thumbnails.folder');
-		$this->image_processing_thumbnails_width   = $this->container->getParameter('scribe_file_uploader.image_processing.thumbnails.width');
-		$this->image_processing_thumbnails_height  = $this->container->getParameter('scribe_file_uploader.image_processing.thumbnails.height');
-		$this->image_processing_thumbnails_square  = $this->container->getParameter('scribe_file_uploader.image_processing.thumbnails.square');
-
-        $kernel_root_dir = $this->container->get('kernel')->getRootDir();        
-		$this->base_filepath = str_replace('%kernel.root_dir%', $kernel_root_dir, $this->base_filepath);
-
-		foreach ($this->allowed_extensions as &$ext) {
-			$ext = strtolower($ext);
-		}
-
-		return [
-			'file_base_path' 	 => $this->base_filepath,
-			'web_base_path'  	 => $this->base_webpath,
-			'allowed_extensions' => $this->allowed_extensions
-		];
-	}
 }
+
+/* EOF */

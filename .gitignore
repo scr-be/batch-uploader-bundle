@@ -1,4 +1,1 @@
-/.idea/
-/bin/
-/vendor/
-*.DS_Store
+.config/builders/build-skel/.build-skel-tpls/gitignore.txt

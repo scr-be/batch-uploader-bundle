@@ -1,6 +1,7 @@
 <?php
+
 /*
- * This file is part of the Scribe World Application.
+ * This file is part of the Scribe Batch Uploader Bundle.
  *
  * (c) Scribe Inc. <scribe@scribenet.com>
  *
@@ -10,13 +11,13 @@
 
 namespace Scribe\FileUploaderBundle\DependencyInjection;
 
-use Symfony\Component\Config\Definition\Builder\TreeBuilder,
-    Symfony\Component\Config\Definition\ConfigurationInterface;
+use Scribe\WonkaBundle\Component\DependencyInjection\AbstractConfiguration;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
 /**
- * Configuration class
+ * Class Configuration
  */
-class Configuration implements ConfigurationInterface
+class Configuration extends AbstractConfiguration
 {
     /**
      * {@inheritDoc}
@@ -24,7 +25,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('scribe_file_uploader');
+        $rootNode = $treeBuilder->root('file_uploader');
 
         $rootNode
             ->children()
@@ -210,3 +211,5 @@ class Configuration implements ConfigurationInterface
         return $treeBuilder;
     }
 }
+
+/* EOF */

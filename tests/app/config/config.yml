@@ -32,9 +32,6 @@ doctrine:
         entity_managers:
             default:
                 mappings:
-                    ScribeCacheBundle:
-                        type: yml
-                        prefix: Scribe\CacheBundle\Doctrine\Entity
                     ScribeMantleBundle:
                         type: yml
                         prefix: Scribe\MantleBundle\Doctrine\Entity
@@ -77,7 +74,4 @@ monolog:
         main:
              type: "null"
 
-scribe_cache:
-    global:
-        enabled: true
-        prefix:  'phpunit'
+scribe_cache: ~

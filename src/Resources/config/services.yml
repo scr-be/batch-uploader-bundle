@@ -1,26 +1,37 @@
 parameters:
-    scribe.file_uploader_helper.class:   Scribe\FileUploaderBundle\Component\FileUploaderHelper
-    scribe.file_uploader_receiver.class: Scribe\FileUploaderBundle\Component\FileUploaderReceiver
 
-    scribe.file_uploader.manager.controller.class:        Scribe\FileUploaderBundle\Controller\ManagerController
-    scribe.file_uploader.fileuploaderdocument.repo.class: Scribe\FileUploaderBundle\Entity\FileUploaderDocumentRepository
+    # component helper
+    s.file_uploader.helper_utils.class:       Scribe\FileUploaderBundle\Component\FileUploaderHelper
+
+    # file receiver
+    s.file_uploader.document_receiver.class:  Scribe\FileUploaderBundle\Component\FileUploaderReceiver
+
+    # upload manager
+    s.file_uploader.manager.controller.class: Scribe\FileUploaderBundle\Controller\ManagerController
+
+    # uploader doctrine entity/repo
+    s.file_uploader.document.repo.class:      Scribe\FileUploaderBundle\Entity\FileUploaderDocumentRepository
+    s.file_uploader.document.entity.class:    Scribe\FileUploaderBundle\Entity\FileUploaderDocument
 
 services:
-    scribe.file_uploader_helper:
-        class: %scribe.file_uploader_helper.class%
-        arguments: ['@service_container']
+    s.file_uploader.helper_utils:
+        class     : %s.file_uploader.helper_utils.class%
+        arguments :
+            - '@service_container'
 
-    scribe.file_uploader_receiver:
-        class: %scribe.file_uploader_receiver.class%
-        arguments: ['@service_container']
+    s.file_uploader.document_receiver:
+        class     : %s.file_uploader.document_receiver.class%
+        arguments :
+            - '@service_container'
 
-    scribe.file_uploader.manager.controller: 
-        class:      %scribe.file_uploader.manager.controller.class%
-        arguments:  [ '@s.utils.controller', '@scribe.file_uploader.fileuploaderdocument.repo' ]
+    s.file_uploader.manager.controller:
+        class     : %s.file_uploader.manager.controller.class%
+        arguments :
+            - '@s.file_uploader.document.repo'
 
-    scribe.file_uploader.fileuploaderdocument.repo:
-        class:           %scribe.file_uploader.fileuploaderdocument.repo.class%
-        factory_service: doctrine
-        factory_method:  getRepository
+    s.file_uploader.document.repo:
+        class           : %s.file_uploader.document.repo.class%
+        factory_service : doctrine
+        factory_method  : getRepository
         arguments:
-            - Scribe\FileUploaderBundle\Entity\FileUploaderDocument
+            - %s.file_uploader.document.entity.class%

@@ -1,6 +1,7 @@
 <?php
+
 /*
- * This file is part of the Scribe World Application.
+ * This file is part of the Scribe Batch Uploader Bundle.
  *
  * (c) Scribe Inc. <scribe@scribenet.com>
  *
@@ -10,10 +11,9 @@
 
 namespace Scribe\FileUploaderBundle\Controller;
 
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException,
-    Symfony\Component\HttpFoundation\Response;
-use Scribe\SharedBundle\Utility\Controller\ControllerUtils,
-    Scribe\FileUploaderBundle\Entity\FileUploaderDocumentRepository;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\Response;
+use Scribe\FileUploaderBundle\Entity\FileUploaderDocumentRepository;
 
 /**
  * Class ManagerController
@@ -21,39 +21,33 @@ use Scribe\SharedBundle\Utility\Controller\ControllerUtils,
 class ManagerController
 {
 	/**
-     * @var ControllerUtils
-     */
-    private $utils;
-
-    /**
      * @var FileUploaderDocumentRepository
      */
     private $fileUploaderDocumentRepo;
 
     /**
-     * @param  ControllerUtils $utils
+     * @param FileUploaderDocumentRepository $fileUploaderDocumentRepo
      */
-    public function __construct(ControllerUtils $utils, FileUploaderDocumentRepository $fileUploaderDocumentRepo)
+    public function __construct(FileUploaderDocumentRepository $fileUploaderDocumentRepo)
     {
-        $this->utils                    = $utils;
         $this->fileUploaderDocumentRepo = $fileUploaderDocumentRepo;
     }
 
     public function getFileAction($fileId)
     {
         try {
-            $document = $this
+            $object = $this
                 ->fileUploaderDocumentRepo
-                ->findOneById($fileId)
-            ;
+                ->findOneById($fileId);
+
         } catch (\Exception $e) {
             throw new NotFoundHttpException('The requested file could not be found');
         }
 
-        return $this->utils->returnResponse(stream_get_contents($document->getFile()), 200, [
+        return Response::create(stream_get_contents($object->getFile()), 200, [
             'Content-Type'              => 'application/octet-stream',
-            'Content-Disposition'       => 'attachment; filename="' . $document->getName() . '"',
-            'Content-Length'            => $document->getSize(),
+            'Content-Disposition'       => 'attachment; filename="' . $object->getName() . '"',
+            'Content-Length'            => $object->getSize(),
             'Content-Transfer-Encoding' => 'binary',
             'Expires'                   => 0,
             'Cache-Control'             => 'must-revalidate',
@@ -61,3 +55,5 @@ class ManagerController
         ]);
     }
 }
+
+/* EOF */

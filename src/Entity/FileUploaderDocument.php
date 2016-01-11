@@ -1,6 +1,7 @@
 <?php
+
 /*
- * This file is part of the Scribe World Application.
+ * This file is part of the Scribe Batch Uploader Bundle.
  *
  * (c) Scribe Inc. <scribe@scribenet.com>
  *
@@ -10,59 +11,45 @@
 
 namespace Scribe\FileUploaderBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-    
+use Scribe\Doctrine\ORM\Mapping\IdEntity;
+use Scribe\MantleBundle\Doctrine\Base\Model\Name\HasName;
+
 /**
- * ConverterStep
+ * Class FileUploaderDocument
  */
-class FileUploaderDocument
+class FileUploaderDocument extends IdEntity
 {
-    /**
-     * @var integer
-     */
-    private $id;
+    use HasName;
 
     /**
      * @var string
      */
-    private $editId;
+    protected $editId;
 
     /**
      * @var string
      */
-    private $name;
+    protected $mimeType;
 
     /**
      * @var string
      */
-    private $mimeType;
-
-    /**
-     * @var string
-     */
-    private $extension;
+    protected $extension;
 
     /**
      * @var int
      */
-    private $size;
+    protected $size;
 
     /**
-     * @var blob
+     * @var string
      */
-    private $file;
-
-    /**
-     * @return integer 
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
+    protected $file;
 
     /**
      * @param  string $editId
-     * @return ConverterStep
+     *
+     * @return $this
      */
     public function setEditId($editId)
     {
@@ -80,27 +67,9 @@ class FileUploaderDocument
     }
 
     /**
-     * @param  string $name
-     * @return ConverterStep
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-    
-        return $this;
-    }
-
-    /**
-     * @return string 
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
      * @param  string $mimeType
-     * @return ConverterStep
+     *
+     * @return $this
      */
     public function setMimeType($mimeType)
     {
@@ -119,7 +88,8 @@ class FileUploaderDocument
 
     /**
      * @param  string $extension
-     * @return ConverterStep
+     *
+     * @return $this
      */
     public function setExtension($extension)
     {
@@ -138,7 +108,8 @@ class FileUploaderDocument
 
     /**
      * @param  string $size
-     * @return ConverterStep
+     *
+     * @return $this
      */
     public function setSize($size)
     {
@@ -157,7 +128,8 @@ class FileUploaderDocument
 
     /**
      * @param  string $file
-     * @return ConverterStep
+     *
+     * @return $this
      */
     public function setFile($file)
     {
@@ -174,3 +146,5 @@ class FileUploaderDocument
         return $this->file;
     }
 }
+
+/* EOF */

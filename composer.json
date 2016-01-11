@@ -2,31 +2,16 @@
 	"name"        : "scr-be/batch-uploader-bundle",
 	"license"     : "MIT",
 	"type"        : "project",
-	"homepage"    : "https://scr.be/file-uploader-bundle",
+	"homepage"    : "https://scr.be/batch-uploader-bundle",
 	"description" : "Bundle to help implement Blueimp's multi-file upload functionality in Symfony.",
 	"support" : {
 		"email"  : "rmf@scr.be",
-		"issues" : "https://ScribeFileUploaderBundle.docs.scribe.tools/issues",
-		"source" : "https://ScribeFileUploaderBundle.docs.scribe.tools/git",
+		"issues" : "https://scr.be/batch-uploader-bundle/git",
+		"source" : "https://scr.be/batch-uploader-bundle/git",
 		"irc"    : "irc://irc.efnet.org/scribe"
 	},
 	"keywords"    : [
-		"file-uploader-bundle",
-		"symfony-file-uploader-bundle",
-		"scribe-file-uploader-bundle",
-		"file-uploader",
-		"uploader",
-		"blueimp",
-		"bundle",
-		"symfony",
-		"symfony2",
-		"symfony-framework",
-		"scribe",
-		"scr",
-		"scribenet",
-		"scribeinc",
-		"scribe-software",
-		"scribe-services"
+		"batch-uploader-bundle", "scribe-batch-uploader-bundle", "blueimp", "bundle", "scr.be", "scribe", "scribenet", "scribe-software", "scribe-systems"
 	],
 	"authors": [
 		{
@@ -45,23 +30,24 @@
 		}
 	],
 	"require" : {
-		"php"                                     : ">=5.6.4,~5.6|~7.0",
-		"scr-be/wonka-bundle"                     : "~0.2",
-		"scr-be/arthur-doctrine-library"          : "~0.1",
-		"scr-be/arthur-doctrine-fixtures-library" : "~0.1"
+		"php"                                    : ">=5.6.4,~5.6|~7.0",
+		"scr-be/wonka-bundle"                    : "~0.3",
+		"scr-be/mantle-bundle"                   : "~2.4",
+		"scr-be/teavee-object-cache-bundle"      : "~2.4",
+		"scr-be/arthur-doctrine-library"         : "~0.3",
+		"scr-be/arthur-doctrine-fixtures-bundle" : "~0.4",
+		"scr-be/arthur-doctrine-uuid-library"    : "~0.2"
 	},
 	"require-dev" : {
         "symfony/symfony"                   : "~2.8|~3.0",
         "symfony/framework-bundle"          : "~2.8|~3.0",
 		"symfony/var-dumper"                : "~2.8|~3.0",
+		"symfony/monolog-bundle"            : "~2.8|~3.0",
 		"symfony/debug-bundle"              : "~2.8|~3.0",
 		"symfony/phpunit-bridge"            : "~2.8|~3.0",
 		"phpunit/phpunit"                   : "~5.0",
 		"codacy/coverage"                   : "~1.0",
 		"satooshi/php-coveralls"            : "~0.7",
-		"chriskite/phactory"                : "~0.4",
-		"fzaninotto/faker"                  : "~1.5",
-        "sensio/generator-bundle"           : "~2.5",
         "doctrine/orm"                      : "~2.5",
         "doctrine/common"                   : "~2.5",
         "doctrine/dbal"                     : "~2.5",
@@ -74,14 +60,17 @@
 			"Scribe\\FileUploaderBundle\\": "src/"
 		}
 	},
-	"preferred-install" : "auto",
+	"autoload-dev" : {
+		"psr-4" : { "Scribe\\FileUploaderBundle\\Tests\\" : "tests/" }
+	},
 	"minimum-stability" : "dev",
-	"config" : {
+	"prefer-stable"     : true,
+	"config": {
 		"bin-dir" : "bin"
 	},
 	"extra": {
 		"branch-alias": {
-			"dev-master": "2.2-dev"
+			"dev-master": "2.4-dev"
 		}
 	}
 }
