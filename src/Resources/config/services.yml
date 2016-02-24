@@ -17,6 +17,7 @@ services:
     s.file_uploader.helper_utils:
         class     : %s.file_uploader.helper_utils.class%
         arguments :
+            - '@session'
             - '@service_container'
 
     s.file_uploader.document_receiver:
@@ -32,7 +33,7 @@ services:
     s.file_uploader.document.repo:
         class           : %s.file_uploader.document.repo.class%
         factory :
-            - doctrine
+            - '@doctrine'
             - getRepository
         arguments:
             - %s.file_uploader.document.entity.class%

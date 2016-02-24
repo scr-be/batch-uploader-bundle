@@ -300,8 +300,8 @@ class FileUploaderReceiver extends FileUploaderConfig
 		$fileObject->extension = pathinfo($path, PATHINFO_EXTENSION);
 
 		if ($error === null) {
-			$fileObject->url  	   = $router->generate('scribe_file_uploader_filesystem_url',    ['fileId'   => $fileObject->id]);
-			$fileObject->deleteUrl = $router->generate('scribe_file_uploader_filesystem_delete', ['fileName' => urlencode($path)]);
+			$fileObject->url  	   = $router->generate('s.file_uploader_filesystem_url',    ['fileId'   => $fileObject->id]);
+			$fileObject->deleteUrl = $router->generate('s.file_uploader_filesystem_delete', ['fileName' => urlencode($path)]);
 		}
 
 		$fileObject->error      = $error;
@@ -330,8 +330,8 @@ class FileUploaderReceiver extends FileUploaderConfig
 		$fileObject->extension  = $document->getExtension();
 
 		if ($error === null) {
-			$fileObject->url  		= $router->generate('scribe_file_uploader_file_url', ['fileId' => $document->getId()]);
-			$fileObject->deleteUrl = $router->generate('scribe_file_uploader_file_delete', ['fileName' => urlencode($document->getName()), 'fileId' => $document->getId()]);
+			$fileObject->url  		= $router->generate('s.file_uploader_file_url', ['fileId' => $document->getId()]);
+			$fileObject->deleteUrl = $router->generate('s.file_uploader_file_delete', ['fileName' => urlencode($document->getName()), 'fileId' => $document->getId()]);
 		}
 
 		$fileObject->error      = $error;
